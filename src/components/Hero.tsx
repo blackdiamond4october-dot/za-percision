@@ -25,23 +25,30 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="w-full max-w-lg mb-8"
         >
-          <div className="flex items-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full overflow-hidden focus-within:border-industrial-orange/50 transition-colors shadow-lg">
-            <div className="pl-5 text-industrial-silver/40">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('products');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="flex items-center bg-black/50 backdrop-blur-md border border-white/10 rounded-full overflow-hidden focus-within:border-industrial-orange/50 transition-colors shadow-lg"
+          >
+            <button type="submit" className="pl-5 pr-2 py-3.5 text-industrial-silver/40 hover:text-industrial-orange transition-colors">
               <Search className="w-5 h-5" />
-            </div>
+            </button>
             <input
               type="text"
               placeholder="Search spare parts..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="flex-1 bg-transparent px-4 py-3.5 text-white text-sm outline-none placeholder:text-industrial-silver/30"
+              className="flex-1 bg-transparent px-2 py-3.5 text-white text-sm outline-none placeholder:text-industrial-silver/30"
             />
             {searchQuery && (
-              <button onClick={() => onSearchChange('')} className="pr-5 text-industrial-silver/40 hover:text-white transition-colors">
+              <button type="button" onClick={() => onSearchChange('')} className="pr-5 pl-2 py-3.5 text-industrial-silver/40 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             )}
-          </div>
+          </form>
         </motion.div>
 
         {/* SINCE 1998 Badge */}
