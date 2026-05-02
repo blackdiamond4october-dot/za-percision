@@ -338,7 +338,7 @@ _Sent from ZA Precision Website_`;
                                         const val = e.target.value.replace(/[^\d]/g, '');
                                         setFormData(prev => ({ ...prev, phone: val }));
                                     }}
-                                    placeholder="3034008573"
+                                    placeholder="Enter phone number"
                                     className="flex-1 bg-white/5 border border-white/10 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg focus:outline-none focus:border-industrial-orange transition-colors text-white text-sm min-w-0"
                                 />
                             </div>

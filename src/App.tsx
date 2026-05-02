@@ -53,7 +53,14 @@ export default function App() {
     };
     try {
         const parsed = saved ? JSON.parse(saved) : null;
-        return { ...defaults, ...parsed };
+        if (parsed) {
+          // Always use latest defaults if saved value is the old placeholder
+          if (parsed.whatsapp === '+1234567890' || parsed.whatsapp === '1234567890') {
+            parsed.whatsapp = defaults.whatsapp;
+          }
+          return { ...defaults, ...parsed };
+        }
+        return defaults;
     } catch {
         return defaults;
     }
@@ -113,6 +120,22 @@ export default function App() {
     setActiveTab(tab);
     setMobileMenuOpen(false);
     if (activePage !== 'home') setActivePage('home');
+    // Scroll to the section after a small delay to allow page to render
+    setTimeout(() => {
+      const sectionMap: Record<string, string> = {
+        home: 'top',
+        products: 'products',
+        about: 'about',
+        contact: 'contact'
+      };
+      const target = sectionMap[tab];
+      if (target === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const el = document.getElementById(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
   const handlePlaceOrder = (product: Product) => {
     setSelectedProduct(product);
@@ -358,7 +381,7 @@ export default function App() {
       <main className="pb-24 md:pb-0">
         {activePage === 'home' && (
           <>
-            <Hero />
+            <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
             
             {/* Products Section */}
             <section id="products" className="py-16 sm:py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto">
@@ -377,28 +400,7 @@ export default function App() {
                     >
                         Precision Components
                     </motion.h2>
-                    <div className="h-1 w-20 bg-industrial-orange/50 rounded-full mb-8" />
-
-                    {/* Search Bar */}
-                    <div className="w-full max-w-lg relative">
-                        <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden focus-within:border-industrial-orange/50 transition-colors">
-                            <div className="pl-4 text-industrial-silver/40">
-                                <Search className="w-5 h-5" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search spare parts by name, category, material..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 bg-transparent px-4 py-3.5 text-white text-sm outline-none placeholder:text-industrial-silver/30"
-                            />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="pr-4 text-industrial-silver/40 hover:text-white transition-colors">
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
+                    <div className="h-1 w-20 bg-industrial-orange/50 rounded-full" />
                 </div>
 
                 {filteredProducts.length > 0 ? (
@@ -437,32 +439,7 @@ export default function App() {
                 )}
             </section>
 
-            {/* Testimonials */}
-            <section className="py-24 bg-white/[0.02] border-y border-white/5 px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl font-display font-bold mb-16 uppercase tracking-wider">Client Trust</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                        {[
-                          { name: 'Pepsi Bottling Co.', quote: 'ZA Precision parts have significantly extended our production runs between maintenance cycles.', role: 'Operations Manager' },
-                          { name: 'Global Bev Corp', quote: 'The dimensional accuracy of their custom manifolds is superior to OEM parts we used previously.', role: 'Technical Lead' }
-                        ].map((t, i) => (
-                            <motion.div 
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                className="glass p-8 rounded-2xl relative"
-                            >
-                                <Star className="absolute top-[-15px] left-8 w-8 h-8 text-industrial-blue fill-industrial-blue" />
-                                <p className="text-industrial-silver italic mb-6 leading-relaxed">"{t.quote}"</p>
-                                <div className="text-left border-l-2 border-industrial-blue pl-4">
-                                    <h4 className="font-display font-bold text-sm">{t.name}</h4>
-                                    <p className="text-[10px] text-industrial-silver/50 uppercase tracking-widest">{t.role}</p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+
 
             {/* About Section */}
             <section id="about" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-white/5">
