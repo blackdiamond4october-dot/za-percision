@@ -90,14 +90,14 @@ export default function ProductCard({ product, onOrder, index }: ProductCardProp
           </div>
         </div>
 
-        <div className="mt-auto pt-3 sm:pt-6 border-t border-white/5 flex items-center justify-between gap-2">
-          <div className="flex flex-col whitespace-nowrap">
-            <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-industrial-silver/40">Inquiry</span>
-            <span className="text-[9px] sm:text-xs font-display text-industrial-orange font-bold uppercase italic">Custom Quote</span>
+        <div className="mt-auto pt-3 sm:pt-6 border-t border-white/5 flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex flex-col flex-shrink-0">
+            <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-industrial-silver/40 mb-0.5 sm:mb-1">Inquiry</span>
+            <span className="text-[9px] sm:text-xs font-display text-industrial-orange font-bold uppercase italic leading-tight">Custom<br />Quote</span>
           </div>
           <button
             onClick={() => onOrder(product)}
-            className="px-3 sm:px-4 xl:px-6 py-2 sm:py-3 bg-industrial-orange text-black font-display text-[8px] sm:text-[9px] xl:text-[10px] font-black uppercase tracking-[0.1em] xl:tracking-[0.2em] hover:bg-white transition-all shadow-[0_0_15px_rgba(239,125,0,0.2)] flex-shrink-0"
+            className="flex-1 px-2 sm:px-3 xl:px-4 py-2 sm:py-3 bg-industrial-orange text-black font-display text-[8px] sm:text-[9px] xl:text-[10px] font-black uppercase tracking-[0.05em] sm:tracking-[0.1em] hover:bg-white transition-all shadow-[0_0_15px_rgba(239,125,0,0.2)] text-center whitespace-nowrap min-w-0"
           >
             <span className="hidden sm:inline">Details & Order</span>
             <span className="sm:hidden">Order</span>
