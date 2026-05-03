@@ -145,7 +145,7 @@ _Sent from ZA Precision Website_`;
     if (whatsappNumber) {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        window.location.href = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+        window.location.href = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
       } else {
         const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
         const link = document.createElement('a');
@@ -173,16 +173,18 @@ _Sent from ZA Precision Website_`;
 
     handleWhatsAppOrder();
 
-    setIsSubmitted(true);
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#ef7d00', '#ffffff', '#f28c28']
-    });
-
+    // Give the mobile OS time to intercept the WhatsApp deep link before destroying the form DOM
     setTimeout(() => {
-      onClose();
+      setIsSubmitted(true);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ef7d00', '#ffffff', '#f28c28']
+      });
+
+      setTimeout(() => {
+        onClose();
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({ customerName: '', phone: '', email: '', location: '', quantity: 1, notes: '' });
