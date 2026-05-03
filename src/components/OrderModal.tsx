@@ -143,7 +143,13 @@ _Sent from ZA Precision Website_`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappNumber = (contactInfo?.whatsapp || '').replace(/\D/g, '');
     if (whatsappNumber) {
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+      const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = url;
+      } else {
+        window.open(url, '_blank');
+      }
     } else {
       alert("Direct contact is currently unavailable. Please try again later.");
     }
@@ -197,7 +203,7 @@ _Sent from ZA Precision Website_`;
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-5xl bg-industrial-black border border-white/5 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[95vh] md:max-h-[90vh]"
+            className="relative w-full max-w-5xl bg-industrial-black border border-white/5 rounded-2xl sm:rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[95vh] md:max-h-[90vh]"
           >
             <button
                 onClick={onClose}
@@ -246,7 +252,7 @@ _Sent from ZA Precision Website_`;
                 </div>
 
                 {/* Secure Order Form Section */}
-                <div className="flex-1 p-4 sm:p-8 md:p-12 overflow-y-auto">
+                <div className="flex-1 p-4 sm:p-8 md:p-12 md:overflow-y-auto">
                     <div className="mb-6 sm:mb-10">
                         <div className="flex items-center gap-2 mb-3 sm:mb-4">
                             <ClipboardList className="w-4 h-4 text-industrial-orange" />
