@@ -143,14 +143,19 @@ _Sent from ZA Precision Website_`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappNumber = (contactInfo?.whatsapp || '').replace(/\D/g, '');
     if (whatsappNumber) {
-      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+      } else {
+        const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } else {
       alert("Direct contact is currently unavailable. Please try again later.");
     }
