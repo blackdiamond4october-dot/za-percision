@@ -190,7 +190,7 @@ _Sent from ZA Precision Website_`;
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -203,7 +203,7 @@ _Sent from ZA Precision Website_`;
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-5xl bg-industrial-black border border-white/5 rounded-2xl sm:rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[95vh] md:max-h-[90vh]"
+            className="relative w-full max-w-5xl bg-industrial-black border border-white/5 rounded-2xl sm:rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[85dvh] sm:max-h-[95vh] md:max-h-[90vh]"
           >
             <button
                 onClick={onClose}
