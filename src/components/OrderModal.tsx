@@ -161,6 +161,12 @@ _Sent from ZA Precision Website_`;
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const proceedToWhatsApp = window.confirm("You are about to open WhatsApp to send your order details. Do you want to continue?");
+    if (!proceedToWhatsApp) {
+      return;
+    }
+
     const fullPhone = getFullPhone();
     onSubmit({
       productId: product?.id || '',
@@ -183,12 +189,13 @@ _Sent from ZA Precision Website_`;
 
       setTimeout(() => {
         onClose();
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({ customerName: '', phone: '', email: '', location: '', quantity: 1, notes: '' });
-        setSelectedCountry(COUNTRY_CODES[0]);
-      }, 500);
-    }, 4000);
+        setTimeout(() => {
+          setIsSubmitted(false);
+          setFormData({ customerName: '', phone: '', email: '', location: '', quantity: 1, notes: '' });
+          setSelectedCountry(COUNTRY_CODES[0]);
+        }, 500);
+      }, 4000);
+    }, 1000);
   };
 
   if (!product) return null;
