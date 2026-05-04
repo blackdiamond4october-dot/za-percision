@@ -14,6 +14,7 @@ interface AdminPanelProps {
   onUpdateProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
   onUpdateOrder: (id: string, status: Order['status']) => void;
+  onDeleteOrder: (id: string) => void;
   onLogout: () => void;
 }
 
@@ -26,6 +27,7 @@ export default function AdminPanel({
   onUpdateProduct,
   onDeleteProduct,
   onUpdateOrder,
+  onDeleteOrder,
   onLogout
 }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'settings'>('products');
@@ -363,12 +365,24 @@ export default function AdminPanel({
                                         <div className="flex justify-end gap-2">
                                             {order.status !== 'completed' && (
                                                 <button 
-                                                    onClick={() => onUpdateOrder(order.id, order.status === 'pending' ? 'contacted' : 'completed')}
-                                                    className="p-2 hover:bg-industrial-orange/20 text-industrial-orange rounded transition-all"
+                                                    onClick={() => onUpdateOrder(order.id, 'completed')}
+                                                    className="p-2 hover:bg-emerald-500/20 text-emerald-500 rounded transition-all"
+                                                    title="Complete Order"
                                                 >
                                                     <Check className="w-4 h-4" />
                                                 </button>
                                             )}
+                                            <button 
+                                                onClick={() => {
+                                                    if (window.confirm('Are you sure you want to delete this order?')) {
+                                                        onDeleteOrder(order.id);
+                                                    }
+                                                }}
+                                                className="p-2 hover:bg-red-500/20 text-red-500 rounded transition-all"
+                                                title="Delete Order"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

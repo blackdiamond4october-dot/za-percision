@@ -557,6 +557,7 @@ export default function App() {
             onUpdateProduct={(p) => setProducts(products.map(old => old.id === p.id ? p : old))}
             onDeleteProduct={(id) => setProducts(products.filter(p => p.id !== id))}
             onUpdateOrder={(id, status) => setOrders(orders.map(o => o.id === id ? { ...o, status } : o))}
+            onDeleteOrder={(id) => setOrders(orders.filter(o => o.id !== id))}
             onLogout={logoutAdmin}
           />
         )}
