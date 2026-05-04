@@ -149,15 +149,11 @@ _Sent from ZA Precision Website_`;
         ? `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`
         : `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
 
-      const link = document.createElement('a');
-      link.href = url;
-      if (!isMobile) {
-        link.target = '_blank';
+      if (isMobile) {
+        window.location.href = url;
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
       }
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     } else {
       alert("Direct contact is currently unavailable. Please try again later.");
     }
