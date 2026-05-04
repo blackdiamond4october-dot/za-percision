@@ -143,23 +143,21 @@ _Sent from ZA Precision Website_`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappNumber = (contactInfo?.whatsapp || '').replace(/\D/g, '');
     if (whatsappNumber) {
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
-      if (isAndroid) {
-        window.location.href = `intent://send?phone=${whatsappNumber}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
-      } else if (isIOS) {
-        window.location.href = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
-      } else {
-        const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-        const link = document.createElement('a');
-        link.href = url;
+      const url = isMobile 
+        ? `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`
+        : `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+
+      const link = document.createElement('a');
+      link.href = url;
+      if (!isMobile) {
         link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
       }
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
       alert("Direct contact is currently unavailable. Please try again later.");
     }
