@@ -151,8 +151,8 @@ function LogoModel() {
         </group>
         {/* A */}
         <group position={[0.9, 0, 0]}>
-            <mesh position={[-0.45, 0, 0]} rotation={[0, 0, 0.25]}><boxGeometry args={[0.4, 1.8, 0.2]} /><meshStandardMaterial color="#ef7d00" /></mesh>
-            <mesh position={[0.45, 0, 0]} rotation={[0, 0, -0.25]}><boxGeometry args={[0.4, 1.8, 0.2]} /><meshStandardMaterial color="#ef7d00" /></mesh>
+            <mesh position={[-0.45, 0, 0]} rotation={[0, 0, -0.25]}><boxGeometry args={[0.4, 1.8, 0.2]} /><meshStandardMaterial color="#ef7d00" /></mesh>
+            <mesh position={[0.45, 0, 0]} rotation={[0, 0, 0.25]}><boxGeometry args={[0.4, 1.8, 0.2]} /><meshStandardMaterial color="#ef7d00" /></mesh>
             <mesh position={[0, -0.2, 0]}><boxGeometry args={[0.6, 0.3, 0.2]} /><meshStandardMaterial color="#ef7d00" /></mesh>
         </group>
       </group>
