@@ -45,6 +45,6 @@ export const INITIAL_PRODUCTS: Product[] = [
 
 export const ADMIN_CODE = 'admin';
 export const COMPANY_EMAIL = 'workspaceforsystem@gmail.com';
-export const COMPANY_WHATSAPP = '923034008573';
+export const COMPANY_WHATSAPP = '+1234567890';
 export const TECHNICAL_SUPPORT_PHONE = '03034008573';
 export const COMPANY_NAME = 'ZA PRECISION';

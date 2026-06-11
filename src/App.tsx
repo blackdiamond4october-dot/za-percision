@@ -17,9 +17,7 @@ import {
   Github, 
   Lock,
   Star,
-  Factory,
-  Search,
-  Wrench
+  Factory
 } from 'lucide-react';
 
 import Hero from './components/Hero';
@@ -53,14 +51,7 @@ export default function App() {
     };
     try {
         const parsed = saved ? JSON.parse(saved) : null;
-        if (parsed) {
-          // Always use latest defaults if saved value is the old placeholder
-          if (parsed.whatsapp === '+1234567890' || parsed.whatsapp === '1234567890') {
-            parsed.whatsapp = defaults.whatsapp;
-          }
-          return { ...defaults, ...parsed };
-        }
-        return defaults;
+        return { ...defaults, ...parsed };
     } catch {
         return defaults;
     }
@@ -80,7 +71,6 @@ export default function App() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
 
   // --- PERSISTENCE ---
   useEffect(() => {
@@ -103,39 +93,11 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'home' | 'products' | 'about' | 'contact'>('home');
 
-  // Filtered products based on search
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
-    const q = searchQuery.toLowerCase();
-    return products.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      p.material.toLowerCase().includes(q)
-    );
-  }, [products, searchQuery]);
-
   // --- HANDLERS ---
   const handleNavClick = (tab: any) => {
     setActiveTab(tab);
     setMobileMenuOpen(false);
     if (activePage !== 'home') setActivePage('home');
-    // Scroll to the section after a small delay to allow page to render
-    setTimeout(() => {
-      const sectionMap: Record<string, string> = {
-        home: 'top',
-        products: 'products',
-        about: 'about',
-        contact: 'contact'
-      };
-      const target = sectionMap[tab];
-      if (target === 'top') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        const el = document.getElementById(target);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
   };
   const handlePlaceOrder = (product: Product) => {
     setSelectedProduct(product);
@@ -154,9 +116,7 @@ export default function App() {
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const storedPassword = localStorage.getItem('admin_password');
-    const validPassword = storedPassword || ADMIN_CODE;
-    if (adminCodeInput === validPassword) {
+    if (adminCodeInput === ADMIN_CODE) {
       setIsAdmin(true);
       setActivePage('admin');
       setShowAdminLogin(false);
@@ -381,11 +341,11 @@ export default function App() {
       <main className="pb-24 md:pb-0">
         {activePage === 'home' && (
           <>
-            <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+            <Hero />
             
             {/* Products Section */}
-            <section id="products" className="py-16 sm:py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto">
-                <div className="flex flex-col items-center mb-10 sm:mb-16 text-center">
+            <section id="products" className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
+                <div className="flex flex-col items-center mb-16 text-center">
                     <motion.span 
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -396,50 +356,51 @@ export default function App() {
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-6 uppercase"
+                        className="text-4xl md:text-5xl font-display font-bold text-white mb-6 uppercase"
                     >
                         Precision Components
                     </motion.h2>
                     <div className="h-1 w-20 bg-industrial-orange/50 rounded-full" />
                 </div>
 
-                {filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-                        {filteredProducts.map((product, i) => (
-                            <ProductCard 
-                                key={product.id} 
-                                product={product} 
-                                index={i}
-                                onOrder={handlePlaceOrder}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col items-center justify-center py-16 text-center"
-                    >
-                        <div className="w-20 h-20 rounded-full bg-industrial-orange/10 flex items-center justify-center mb-6">
-                            <Search className="w-10 h-10 text-industrial-orange/50" />
-                        </div>
-                        <h3 className="text-xl font-display font-bold text-white mb-2 uppercase">No Parts Found</h3>
-                        <p className="text-industrial-silver/50 text-sm mb-8 max-w-md">
-                            We couldn't find "{searchQuery}" in our catalog. Need a custom part? Our engineers can build it for you.
-                        </p>
-                        <a
-                            href="#contact"
-                            onClick={() => setSearchQuery('')}
-                            className="px-8 py-4 bg-industrial-orange text-black font-display font-black uppercase tracking-wider text-xs hover:neon-glow transition-all flex items-center gap-3 rounded-lg"
-                        >
-                            <Wrench className="w-5 h-5" />
-                            Custom Your Spare Part
-                        </a>
-                    </motion.div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {products.map((product, i) => (
+                        <ProductCard 
+                            key={product.id} 
+                            product={product} 
+                            index={i}
+                            onOrder={handlePlaceOrder}
+                        />
+                    ))}
+                </div>
             </section>
 
-
+            {/* Testimonials */}
+            <section className="py-24 bg-white/[0.02] border-y border-white/5 px-6">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-3xl font-display font-bold mb-16 uppercase tracking-wider">Client Trust</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {[
+                          { name: 'Pepsi Bottling Co.', quote: 'ZA Precision parts have significantly extended our production runs between maintenance cycles.', role: 'Operations Manager' },
+                          { name: 'Global Bev Corp', quote: 'The dimensional accuracy of their custom manifolds is superior to OEM parts we used previously.', role: 'Technical Lead' }
+                        ].map((t, i) => (
+                            <motion.div 
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                className="glass p-8 rounded-2xl relative"
+                            >
+                                <Star className="absolute top-[-15px] left-8 w-8 h-8 text-industrial-blue fill-industrial-blue" />
+                                <p className="text-industrial-silver italic mb-6 leading-relaxed">"{t.quote}"</p>
+                                <div className="text-left border-l-2 border-industrial-blue pl-4">
+                                    <h4 className="font-display font-bold text-sm">{t.name}</h4>
+                                    <p className="text-[10px] text-industrial-silver/50 uppercase tracking-widest">{t.role}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* About Section */}
             <section id="about" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-white/5">
@@ -532,7 +493,7 @@ export default function App() {
                             <h3 className="font-display font-bold uppercase">Quick Inquiry</h3>
                             <p className="text-xs text-industrial-silver/60 mb-4">Average response time: 30 minutes</p>
                             <a 
-                                href={`https://wa.me/${(contactInfo.whatsapp || '').replace(/\D/g,'')}`}
+                                href={`https://wa.me/${(COMPANY_WHATSAPP || '').replace(/\D/g,'')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full py-4 bg-industrial-orange text-black font-display font-black uppercase text-xs tracking-widest hover:neon-glow transition-all flex items-center justify-center gap-2"
@@ -557,7 +518,6 @@ export default function App() {
             onUpdateProduct={(p) => setProducts(products.map(old => old.id === p.id ? p : old))}
             onDeleteProduct={(id) => setProducts(products.filter(p => p.id !== id))}
             onUpdateOrder={(id, status) => setOrders(orders.map(o => o.id === id ? { ...o, status } : o))}
-            onDeleteOrder={(id) => setOrders(orders.filter(o => o.id !== id))}
             onLogout={logoutAdmin}
           />
         )}
@@ -652,7 +612,7 @@ export default function App() {
       {/* Floating Action Buttons */}
       <div className="fixed bottom-28 right-6 z-[60] flex flex-col gap-4 md:bottom-8 md:right-8">
           <motion.a
-            href={`https://wa.me/${(contactInfo.whatsapp || '').replace(/\D/g,'')}`}
+            href={`https://wa.me/${(COMPANY_WHATSAPP || '').replace(/\D/g,'')}`}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.1 }}

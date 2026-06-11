@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, Edit3, MessageSquare, Package, User, Star, ArrowLeft, LogOut, Check, ShieldCheck, Upload, Image as ImageIcon, Link as LinkIcon, X, Lock, AlertTriangle } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Plus, Trash2, Edit3, MessageSquare, Package, User, Star, ArrowLeft, LogOut, Check, ShieldCheck, Upload, Image as ImageIcon, Link as LinkIcon, X } from 'lucide-react';
 import { Product, Order, Review } from '../types';
 import { cn } from '../lib/utils';
 import { ADMIN_CODE } from '../constants';
@@ -14,7 +14,6 @@ interface AdminPanelProps {
   onUpdateProduct: (product: Product) => void;
   onDeleteProduct: (id: string) => void;
   onUpdateOrder: (id: string, status: Order['status']) => void;
-  onDeleteOrder: (id: string) => void;
   onLogout: () => void;
 }
 
@@ -27,7 +26,6 @@ export default function AdminPanel({
   onUpdateProduct,
   onDeleteProduct,
   onUpdateOrder,
-  onDeleteOrder,
   onLogout
 }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'settings'>('products');
@@ -37,7 +35,7 @@ export default function AdminPanel({
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'engine' as Product['category'],
+    category: '' as Product['category'],
     images: [''],
     compatibility: '',
     material: '',
@@ -46,10 +44,19 @@ export default function AdminPanel({
 
   const [imageInputTypes, setImageInputTypes] = useState<('url' | 'file')[]>(['url']);
 
-  // Password change state
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPasswordModal, setConfirmPasswordModal] = useState(false);
-  const [passwordChanged, setPasswordChanged] = useState(false);
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      category: '' as Product['category'],
+      images: [''],
+      compatibility: '',
+      material: '',
+      dimensions: '',
+    });
+    setImageInputTypes(['url']);
+    setEditingId(null);
+  };
 
   const handleAddImageField = () => {
     setFormData(prev => ({ ...prev, images: [...prev.images, ''] }));
@@ -74,8 +81,41 @@ export default function AdminPanel({
     if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-            const base64String = reader.result as string;
-            handleImageChange(index, base64String);
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    handleImageChange(index, compressedBase64);
+                } else {
+                    handleImageChange(index, reader.result as string);
+                }
+            };
+            img.onerror = () => {
+                handleImageChange(index, reader.result as string);
+            };
+            img.src = reader.result as string;
         };
         reader.readAsDataURL(file);
     }
@@ -96,13 +136,11 @@ export default function AdminPanel({
         if (existing) {
             onUpdateProduct({ ...existing, ...formData, images: cleanImages });
         }
-        setEditingId(null);
     } else {
         onAddProduct({ ...formData, images: cleanImages });
-        setIsAdding(false);
     }
-    setFormData({ name: '', description: '', category: 'engine', images: [''], compatibility: '', material: '', dimensions: '' });
-    setImageInputTypes(['url']);
+    resetForm();
+    setIsAdding(false);
   };
 
   const startEdit = (product: Product) => {
@@ -166,7 +204,7 @@ export default function AdminPanel({
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-display font-bold text-white">Product Inventory</h2>
                     <button 
-                        onClick={() => { setIsAdding(true); setEditingId(null); }}
+                        onClick={() => { resetForm(); setIsAdding(true); }}
                         className="px-4 py-2 bg-industrial-orange text-black font-display text-xs font-bold uppercase tracking-widest flex items-center gap-2"
                     >
                         <Plus className="w-4 h-4" />
@@ -183,7 +221,7 @@ export default function AdminPanel({
                         <form onSubmit={handleFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="md:col-span-2 flex justify-between items-center mb-2">
                                 <h3 className="font-display text-lg text-industrial-orange">{editingId ? 'Edit Product' : 'Create New Product'}</h3>
-                                <button type="button" onClick={() => { setIsAdding(false); setEditingId(null); }} className="text-industrial-silver hover:text-white"><ArrowLeft className="w-5 h-5"/></button>
+                                <button type="button" onClick={() => { setIsAdding(false); resetForm(); }} className="text-industrial-silver hover:text-white"><ArrowLeft className="w-5 h-5"/></button>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] uppercase text-industrial-silver/50 font-display">Product Name</label>
@@ -365,24 +403,12 @@ export default function AdminPanel({
                                         <div className="flex justify-end gap-2">
                                             {order.status !== 'completed' && (
                                                 <button 
-                                                    onClick={() => onUpdateOrder(order.id, 'completed')}
-                                                    className="p-2 hover:bg-emerald-500/20 text-emerald-500 rounded transition-all"
-                                                    title="Complete Order"
+                                                    onClick={() => onUpdateOrder(order.id, order.status === 'pending' ? 'contacted' : 'completed')}
+                                                    className="p-2 hover:bg-industrial-orange/20 text-industrial-orange rounded transition-all"
                                                 >
                                                     <Check className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button 
-                                                onClick={() => {
-                                                    if (window.confirm('Are you sure you want to delete this order?')) {
-                                                        onDeleteOrder(order.id);
-                                                    }
-                                                }}
-                                                className="p-2 hover:bg-red-500/20 text-red-500 rounded transition-all"
-                                                title="Delete Order"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -466,91 +492,9 @@ export default function AdminPanel({
                         </div>
                     </div>
                 </div>
-
-                {/* Password Change Section */}
-                <div className="glass p-10 rounded-2xl border-white/5 space-y-6 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-red-500/20" />
-                    <div className="flex items-center gap-3 mb-2">
-                        <Lock className="w-5 h-5 text-red-400" />
-                        <h3 className="text-lg font-display font-bold text-white uppercase italic tracking-tighter">Change Admin Password</h3>
-                    </div>
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-400 shadow-[0_0_8px_#f87171]" />
-                            <label className="text-[10px] uppercase tracking-[0.2em] text-industrial-silver/50 font-display">New Password</label>
-                        </div>
-                        <input
-                            type="password"
-                            className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white font-mono text-sm focus:border-red-400 transition-all outline-none"
-                            value={newPassword}
-                            onChange={(e) => { setNewPassword(e.target.value); setPasswordChanged(false); }}
-                            placeholder="Enter new admin password"
-                        />
-                    </div>
-                    <button
-                        type="button"
-                        disabled={!newPassword.trim()}
-                        onClick={() => setConfirmPasswordModal(true)}
-                        className="w-full py-4 bg-red-500/20 text-red-400 font-display font-bold uppercase tracking-widest text-xs border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                        Change Password
-                    </button>
-                    {passwordChanged && (
-                        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-emerald-500 text-xs">
-                            <Check className="w-4 h-4" />
-                            <span className="font-display uppercase tracking-widest text-[10px]">Password updated successfully</span>
-                        </motion.div>
-                    )}
-                </div>
             </div>
         )}
       </div>
-
-      {/* Password Confirmation Modal */}
-      <AnimatePresence>
-        {confirmPasswordModal && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setConfirmPasswordModal(false)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-md"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-sm glass p-8 rounded-2xl border-red-500/20 text-center"
-            >
-              <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-8 h-8 text-red-400" />
-              </div>
-              <h3 className="text-xl font-display font-bold text-white mb-3 uppercase">Are You Sure?</h3>
-              <p className="text-industrial-silver/60 text-sm mb-8">This will permanently change your admin login password. Make sure you remember the new password.</p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setConfirmPasswordModal(false)}
-                  className="flex-1 py-3 bg-white/5 border border-white/10 text-white/60 font-display text-xs uppercase tracking-widest rounded-xl hover:bg-white/10 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    localStorage.setItem('admin_password', newPassword.trim());
-                    setConfirmPasswordModal(false);
-                    setNewPassword('');
-                    setPasswordChanged(true);
-                  }}
-                  className="flex-1 py-3 bg-red-500 text-white font-display text-xs uppercase tracking-widest font-bold rounded-xl hover:bg-red-600 transition-all"
-                >
-                  I Am Sure
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
